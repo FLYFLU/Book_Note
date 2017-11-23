@@ -1,0 +1,437 @@
+/*
+** Effective C# Note
+** 因为本书比较薄，就不分章节了
+** Notice:Use C# 2.0
+/*
+
+
+Notice 1:readonly和const
+{
+	readonly和const区别：
+	readonly:运行时常量
+	const:编译时常量，会进行类型检查
+	类型检查：例如不可以把一个Int32赋值给String;
+	
+	最重要的一点：当一个动态库DLL1引用了别人的动态库DLL_Other,
+	在DLL_Other中存在一个const时，而自己的DLL1又使用了这个const。
+	如果别人改了这个const,但是自己的DLL没有重新编译的话，
+	使用的值是旧值，而不是修改过后的值。重新编译可以解决该问题，
+	readonly 也不存在该问题。
+	效率上来说 const>readonly。
+}
+
+Notice 2:关于Foreach
+{
+	可以进行Foreach迭代的前提是实现了IEnumerable<T>或者IEnumerable
+	实现IEnumerable的类会导致Foreach效率下降（强制转换）
+	Code:
+	public void UseCollection(IEnumerable collect)
+	{
+		IEnumerator ie = collect.GetEnumerator();
+		while(ie.MoveNext())
+		{
+			T t = (T)ie.Current; //存在转换
+			t.Method();
+		}
+	}
+	Warning:有待考证，C# 2.0对泛型的支持未知，使用泛型的IEnumerable<T>不存在该问题
+}
+
+Notice 3: 条件编译
+{
+	Code:
+	#if DEBUG
+	DoSomething();
+	#endif
+	
+	[Conditinal("DEBUG")]
+	DoSomething();
+	
+	使用Conditional的代码会存在硬盘上，#if不会
+}
+
+Notice 4: IFormattable接口
+
+Notice 5: 恒定值 参考DateTime
+
+Notice 6: 枚举类型
+{
+	枚举类型的默认值是0，所以一般的枚举都会有一个0值
+	Code:
+	enum Source
+	{
+		None     = 0x00,
+		Text     = 0x01,
+		Server   = 0x02,
+		XML      = 0x04,
+		Database = 0x10
+	}
+	如果没有0存在的话，声明一个Source s 但是没有给他赋值的话，可能造成错误
+}
+
+Notice 6:Equals(object obj)方法
+{
+	重写Equals方法需要同时重写GetHashCode，因为对象相等，在哈希表中应该处于同一位置
+	重写Equals方法会造成A==B,B!=A
+	Code:
+	Clasa A
+	{
+		public override Equals(object obj)
+		{
+			if(obj==null)
+				return false;
+			if(object.ReferenceEquals(this,obj))
+			    return true;
+			A tmp = obj as A;
+			if(tmp==null)
+				return false;
+			return ComparaAProperty(this,tmp);
+		}
+	}
+	
+	Clasa B:A
+	{
+		public override Equals(object obj)
+		{
+			if(obj==null)
+				return false;
+			if(object.ReferenceEquals(this,obj))
+			    return true;
+			B tmp = obj as B;
+			if(tmp==null)
+				return false;
+			if(!base.Compare(tmp))
+				return false;
+			return ComparaBProperty(this,tmp);
+		}
+	}
+	
+	TestCode:
+	A a = new A();
+	B b = new B();
+	//b is A ,so return ComparaAProperty
+	a.Equals(b); //True
+	//a is not b ,return false
+	b.Equals(a); //False
+	
+	这是不合法的，违背了对称性
+	
+	PS:
+	数学相等性质：1.自反性 a==a；2.对称性 a==b,则b==a；3.传递性 a==b,b==c,则a==c.
+}
+
+Notice 7 哈希散列值的必须是实例不变的
+{
+	因为对象的哈希散列值改变后，如果对象不变的话，就不可以通过哈希码找到了
+	Code:
+	public struct MyTest
+	{
+		private string _msg;
+		private int    _id;
+		
+		override GetHashCode()
+		{
+			return _msg.GetHashcode();
+		}
+	}
+}
+
+Notice 8 For咸鱼写法
+{
+	Code:
+	int[] array = new int[100];
+	int length = array.Length;
+	for(int i =0;i<length;i++)
+	{
+		Console.WriteLine(array[i]);
+	}
+	
+	这种写法会降低效率，原因是for循环内部的代码其实是这样的
+	for(int i =0;i<length;i++)
+	{
+		if(i>array.Length)
+			throw new IndexOutofRangeException()
+		Console.WriteLine(array[i]);
+	}
+	
+	优化的代码，这种情况只会检查一次，.Net的优化原因
+	for(int i =0;i<array.Length;i++)
+	{
+		Console.WriteLine(array[i]);
+	}
+}
+
+Notice 9 GetHashCode()遵守的规则
+{
+	1、对象是相等的(==定义)，那么他们必须产生相同的散列值
+	2、任意对象A,A.GetHashCode()必须是实例不变的
+	3、均衡分布，通用的算法是对所有字段进行XOR（异或）后返回
+}
+
+Notice 10 关于析构函数
+{
+	GC发现某个对象是垃圾但是需要析构时，他还不能直接从内存上删除这个对象。
+	首先，他要调用对象的析构函数，但是对象的析构函数不是在垃圾回收器的同一个线程上运行的。
+	取而代之的是，GC不得不把对象放置到析构队列中，让另一个线程去执行所有析构函数。
+	GC继续自己的工作，从内存上移除其他垃圾。在下一个GC回收时，那些被析构了的对象才会被从内存上删除。
+}
+
+Notice 11 关于构造函数顺序
+{
+	1、静态变量储存位置0
+	2、静态变量预置方法执行
+	3、基类的静态构造函数执行
+	4、静态构造函数执行
+	5、实例变量储存位置0
+	6、实例变量预置方法执行
+	7、恰当的基类实例构造函数执行
+	8、实例构造函数执行
+}
+
+Notice 12 Close()和Dispose()
+{
+	Dispose方法会释放更多的资源，它还会告诉GC，这个对象已经不需要在析构了。
+	Dispose会调用GC.SuppressFinalize()，但是Close()一般不会。
+	
+	当你把一个实现了IDispose()接口的局部变量提升为类型成员时，例如字体，你的同样应该实现IDispose()
+}
+
+Notice 13 拆箱和装箱
+{
+	装箱：把一个值类型数据转化为一个引用数据类型。此时，一个新的引用类型在堆上创建，它就是这个箱子。
+	值类型的数据就在引用类型中储存了一份拷贝。箱子中是包含值类型的一份拷贝的，并且复制实现了已经装箱对象的接口。
+	不管你何时访问这个箱子时，都会创建一个拷贝。
+	
+	这样可能会引起一个BUG
+	Code:
+	public struct Person
+	{
+		private string _name;
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+		}
+		
+		public override ToString()
+		{
+			return _name;
+		}
+	}
+	
+	ArrayList al = new ArrayList();
+	Person p = new Person("TestName"); 
+	al.Add(p);
+	var p = (Person)al[0];
+	p.Name = "ChangeName";
+	Console.WriteLine(((Person)al[0]).Name);//TestName
+}
+
+Notice 14 隐藏基类方法
+{
+	interface IMsg
+	{
+		void ShowMsg();
+	}
+	
+	public BasicClass:IMsg
+	{
+		public void ShowMsg()
+		{
+			Console.WriteLine("BasicClass");
+		}
+	}
+	
+	public DerivedClass:BasicClass
+	{
+		public new void ShowMsg()
+		{
+			Console.WriteLine("DerivedClass");
+		}
+	}
+	public DerivedClass2:BasicClass,IMsg
+	{
+		public new void ShowMsg()
+		{
+			Console.WriteLine("DerivedClass2");
+		}
+	}
+	void Main()
+	{
+		DerivedClass dc = new DerivedClass();
+		dc.ShowMsg();    //DerivedClass
+		IMsg msger = (IMsg)dc;
+		msger.ShowMsg();    //BasicClass
+		
+		DerivedClass2 dc = new DerivedClass2();
+		dc.ShowMsg();    //DerivedClass2
+		IMsg msger = (IMsg)dc;
+		msger.ShowMsg();    //DerivedClass2	
+		
+		BasicClass bc= dc;
+		bc.ShowMsg();    //BasicClass
+	}
+}
+
+Notice 15 IComparable
+{
+	一般的写法:
+	Code:
+	public struct Person:IComparable
+	{
+		private readonly string _name;
+		public Person(string name)
+		{
+			_name = name;
+		}
+		
+		public int CompareTo(object right)
+		{
+			if(!(right is Person))
+			{
+				throw new ArgumentException("比较类型错误");
+			}
+			Person p = (Person)right;
+			return this._name.CompareTo(p._name);
+		}
+	}
+	
+	这种写法存在性能上的问题，1、比较时，需要检查入参的类型 2、需要对类型进行拆箱和装箱	
+	优化的方法：
+	Code:
+	public struct Person:IComparable
+	{
+		private readonly string _name;
+		public Person(string name)
+		{
+			_name = name;
+		}
+		
+		IComparable.CompareTo(object right)
+		{
+			if(!(right is Person))
+			{
+				throw new ArgumentException("比较类型错误");
+			}
+			Person p = (Person)right;
+			return CompareTo(p);
+		}
+		
+		public int CompareTo(Person right)
+		{
+			return this._name.CompareTo(p._name);
+		}
+	}
+}
+
+Notice 16 隐式转换
+{
+	Code:	
+	Class SourceClass
+	{
+		private string _srcName;
+		
+		public SourceClass(string name)
+		{
+			_srcName = name;
+		}
+		
+		public static Implicit Operator ConvertClass(SourceClass src)
+		{
+			return new ConvertClass(src._srcName);
+		}
+	}
+	
+	Class ConvertClass
+	{
+		string _name;
+		public ConvertClass(string name)
+		{
+			_name = name;
+		}
+	}
+	
+	void TestMethod(ConvertClass cc)
+	{
+		
+	}
+	
+	void Main()
+	{
+		SourceClass sc = new SourceClass("SC");
+		var tmp = (ConvertClass)sc;
+		
+		TestMethod(sc);    //right	
+		//说明：TestMethod方法得到的是新创建的ConvertClass对象，对这个临时对象对象进行操作，
+		//临时对象很快成为垃圾，自己本身并没有变化
+	}
+}
+
+Notice 17 New方法的危害
+{
+	Code；
+	Clasa BasicClass
+	{
+		public void ShowMsg()
+		{
+			Console.WriteLine("BasicClass");
+		}
+	}
+	
+	Clasa DerivedClass:BasicClass
+	{
+		public new void ShowMsg()
+		{
+			Console.WriteLine("DerivedClass");
+		}
+	}
+	
+	void Main()
+	{
+		object obj = new DerivedClass();
+		BasicClass b= obj as DerivedClass;
+		b.ShowMsg();	//"BasicClass"
+		DerivedClass d = obj as DerivedClass;
+		d.ShowMsg();	//"DerivedClass"
+	}
+}
+
+Notice 18 JIT编译问题
+{
+	Code:
+	void ShowMsg(int count)
+	{
+		StringBuilder sb = new StringBuilder();
+		if(count>0)
+		{
+			for(int i = 0; i<count; i++)
+			{
+				sb.Append(i.ToString());
+			}
+		}
+		else
+		{
+			sb.Append(i.ToString());
+		}
+		Console.WriteLine(sb.ToString());
+	}
+	
+	第一次调用ShowMsg时，两个选择项就都编译了，实际上只有一个是需要的。
+	
+	void ShowMsg(int count)
+	{
+		StringBuilder sb = new StringBuilder();
+		if(count>0)
+		{
+			ForAppendString(sb);
+		}
+		else
+		{
+			AppendString(sb);
+		}
+		Console.WriteLine(sb.ToString());
+	}
+	JIT需要小函数
+}
