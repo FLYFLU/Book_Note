@@ -2,7 +2,7 @@
 
 -- no.1 use ranking variable
 -- if use select * from table1 etc,mysql will warning SQL syntax
-select id ,@rankno:=@rankno+1 from table1 (select @rankno:=0) r ;
+select id ,@rankno:=@rankno+1 from table1 ,(select @rankno:=0) r ;
 
 -- ps:
 -- "=":
