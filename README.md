@@ -2,4 +2,4 @@
 Some Note of Book
 
 #CSharp
-Effective_CSharp(¸ÄÉÆCSharp³ÌĞòµÄ50ÖÖ·½·¨)
+Effective_CSharp(ã€Šæ”¹å–„c#çš„50ç§æ–¹æ³•ã€‹)
