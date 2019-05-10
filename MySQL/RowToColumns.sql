@@ -38,3 +38,14 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+-- 执行顺序
+-- sql语法
+select * from table where predicae group by cols having predicaeh order by col limit offset;
+-- 执行顺序为
+from table
+where predicae
+group by cols
+having predicaeh
+select *
+order by col
+limit offset 	
