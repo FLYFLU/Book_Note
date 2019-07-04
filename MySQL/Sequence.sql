@@ -1,6 +1,6 @@
-//Sqlserver
-//find the first longest consecutive years
-//https://stackoverflow.com/questions/56878926/how-to-find-the-first-longest-consecutive-years
+-- Sqlserver
+-- find the first longest consecutive years
+-- https://stackoverflow.com/questions/56878926/how-to-find-the-first-longest-consecutive-years
 
 create table test1 (year int)
 
