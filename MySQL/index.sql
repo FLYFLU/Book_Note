@@ -35,3 +35,13 @@ select colname … from A表 Left join B表 on where a.id = b.id where b.id is n
 select id,name from product limit 866613, 20
 --优化sql
 select id,name from product where id> 866612 limit 20
+
+--对于null的判断会导致引擎放弃使用索引而进行全表扫描
+
+--LIKE “%name”或者LIKE “%name%”，这种查询会导致索引失效而进行全表扫描
+--可以使用LIKE “name%”
+--前后匹配可以使用全文索引
+
+--LEFT JOIN A表为驱动表
+--INNER JOIN MySQL会自动找出那个数据少的表作用驱动表
+--RIGHT JOIN B表为驱动表
