@@ -45,3 +45,10 @@ select id,name from product where id> 866612 limit 20
 --LEFT JOIN A表为驱动表
 --INNER JOIN MySQL会自动找出那个数据少的表作用驱动表
 --RIGHT JOIN B表为驱动表
+
+-- 使用覆盖索引
+-- 高性能mysql 第三版 172页
+select * from products where actor='sean' and title like '%app%'
+--修改为
+select * from products join (select prod_id from products where actor='sean' and title like '%app%') as t1
+on t1.prod_id = products.prod_id
