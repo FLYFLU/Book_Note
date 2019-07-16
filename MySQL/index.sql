@@ -47,6 +47,7 @@ select id,name from product where id> 866612 limit 20
 --RIGHT JOIN B表为驱动表
 
 -- 使用覆盖索引
+-- 延迟关联
 -- 高性能mysql 第三版 172页
 select * from products where actor='sean' and title like '%app%'
 --修改为
