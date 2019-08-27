@@ -53,3 +53,8 @@ select * from products where actor='sean' and title like '%app%'
 --修改为
 select * from products join (select prod_id from products where actor='sean' and title like '%app%') as t1
 on t1.prod_id = products.prod_id
+
+
+-- not in修改为left join 
+select * from student where id not in (select id from major)
+修改为 select * from student a left join major b on a.id=b.id  where b.id is not null
