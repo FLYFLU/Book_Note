@@ -1,0 +1,7 @@
+1、使用特性实现Redis过期
+eg
+[Redis(ExpireTime=60,Key="keys"]
+Method()
+然后在拦截器中实现
+var customes = invocation.MethodInvocationTarget.GetCustomAttributes(false);
+获取到特性，在处理基本逻辑
