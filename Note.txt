@@ -4,4 +4,20 @@ eg
 Method()
 然后在拦截器中实现
 var customes = invocation.MethodInvocationTarget.GetCustomAttributes(false);
-获取到特性，在处理基本逻辑
+获取到特性，在处理基本逻辑，这样就不用每块代码都写了
+
+2、使用拦截器赋值
+    public void Intercept(IInvocation invocation)
+		{
+        //设置第一个参数值
+        invocation.SetArgumentValue(1, "1234");
+				Console.WriteLine(string.Format("Entered Method:{0}, Arguments: {1}", methodName, string.Join(",", invocation.Arguments)));
+				invocation.Proceed();
+				Console.WriteLine(string.Format("Sucessfully executed method:{0}", methodName));
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(string.Format("Method:{0}, Exception:{1}", methodName, e.Message));
+				throw;
+			}
+		}
