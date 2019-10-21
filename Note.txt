@@ -1,6 +1,6 @@
-1、使用特性实现Redis过期
+1、使用特性控制接口访问频率
 eg
-[Redis(ExpireTime=60,Key="keys"]
+[APILimitVisit(ExpireTime=60,Key="keys"]
 Method()
 然后在拦截器中实现
 var customes = invocation.MethodInvocationTarget.GetCustomAttributes(false);
