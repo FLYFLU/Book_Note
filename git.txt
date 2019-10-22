@@ -1,0 +1,5 @@
+1、命令行切换到工程目录
+2、切换到.git目录下
+3、git config user.name "username"
+4、git config user.email "1****@qq.com"
+5、配置记住密码git config credential.helper store
