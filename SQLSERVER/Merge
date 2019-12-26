@@ -1,0 +1,12 @@
+Merge into TargetTable as t
+Using SourceTable as s
+on t.Id = s.TId
+WHEN MATCHED
+TEHN
+  -- sql
+WHEN NOT MATCHED
+TEHN
+  -- sql
+WHEN NOT MATCHED BY SOURCE
+THEN
+  -- sql
