@@ -1,0 +1,4 @@
+ java允许我们在一个类里面定义静态类。比如内部类（nested class）。
+ 把nested class封闭起来的类叫外部类。
+ 在java中，我们不能用static修饰顶级类（top level class）。
+ 只有内部类可以为static。
