@@ -2,3 +2,6 @@
  把nested class封闭起来的类叫外部类。
  在java中，我们不能用static修饰顶级类（top level class）。
  只有内部类可以为static。
+
+
+jdbc:rewriteBatchedStatements
