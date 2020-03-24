@@ -23,3 +23,6 @@ var customes = invocation.MethodInvocationTarget.GetCustomAttributes(false);
 		}
 		
 		ThreadLocal
+
+
+docker ps -a | awk '{print $1}'|xargs docker stop
