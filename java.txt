@@ -5,3 +5,6 @@
 
 
 jdbc:rewriteBatchedStatements
+
+
+java动态代理为什么只能代理接口
