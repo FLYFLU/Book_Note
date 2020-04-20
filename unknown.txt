@@ -1,1 +1,18 @@
 mybaits 参数填充，懒加载
+
+
+/// <summary>
+/// 调整生成器的默认行为
+/// <para/>生成的表名称为单数，外键关闭级联删除
+/// </summary>
+/// <param name="modelBuilder"></param>
+public static void AdjustDbDefautAction(this ModelBuilder modelBuilder) {
+    foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes()) {
+        if (mutableEntityType.ClrType == null)
+            continue;
+        foreach (var foreignKey in mutableEntityType.GetForeignKeys()) {
+            var canCascadeDelete = foreignKey.Properties[0]?.PropertyInfo?.GetCustomAttributes<ForeignKeyReferenceAttribute>()?.SingleOrDefault();
+            foreignKey.DeleteBehavior = canCascadeDelete?.DeleteBehavior ?? DeleteBehavior.Restrict;
+        }
+    }
+}　　
