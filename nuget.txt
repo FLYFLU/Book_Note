@@ -1,0 +1,13 @@
+    <packageSources>
+        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+        <add key="Corp" value="https://nexus.mychery.com/repository/nuget-public/" />
+    </packageSources>
+    <config>
+        <add key="globalPackagesFolder" value="E:\Nuget" />
+    </config>
+    <packageSourceCredentials>
+        <Corp>
+            <add key="Username" value="gitlab-runner" />
+            <add key="ClearTextPassword" value="sunlight123" />
+        </Corp>
+    </packageSourceCredentials> 
